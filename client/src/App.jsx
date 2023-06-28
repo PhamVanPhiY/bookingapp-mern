@@ -23,6 +23,10 @@ function App() {
             path="/account/:subpage?"
             element={<AccountPage></AccountPage>}
           />
+          <Route
+            path="/account/:subpage/:action"
+            element={<AccountPage></AccountPage>}
+          />
         </Route>
       </Routes>
     </UserContextProvider>
