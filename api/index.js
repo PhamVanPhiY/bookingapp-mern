@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
+const multer = require("multer");
+const fs = require("fs");
 require("dotenv").config();
 const app = express();
 
@@ -14,6 +16,7 @@ const jwtSecret = "qweadjasdladhaksldhakshdak";
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(
   cors({
     credentials: true,
@@ -95,6 +98,23 @@ app.post("/upload-by-link", async (req, res) => {
   res.json(newName);
 });
 
-app.listen(4000);
+const photosMiddleware = multer({ dest: "uploads/" });
+
+app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
+  const uploadedFile = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i];
+
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    const newPath = path + "." + ext;
+    fs.renameSync(path, newPath);
+    uploadedFile.push(newPath.replace("uploads\\", ""));
+  }
+
+  res.json(uploadedFile);
+});
+
+app.listen(5000);
 
 //1:34:12 fix loi
